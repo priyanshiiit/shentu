@@ -5,14 +5,19 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/certikfoundation/shentu/v2/x/cert/types"
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
+
+	"github.com/certikfoundation/shentu/v2/x/cert/types"
 )
 
 type IntegrationTestSuite struct {
 	suite.Suite
+	cfg     network.Config
+	network *network.Network
 }
 
 func (suite *IntegrationTestSuite) SetupSuite() {
@@ -34,7 +39,7 @@ func (suite *IntegrationTestSuite) TestCertifierQueryCmd() {
 	}{
 		{
 			"valid query",
-			"certik18w5txca7skklxe7y54nsxz22tqgtvrkzffrem8",
+			"abc",
 			errArgs{
 				shouldPass: true,
 				contains:   "",
@@ -64,7 +69,6 @@ func (suite *IntegrationTestSuite) TestCertifierQueryCmd() {
 		suite.Run(tc.name, func() {
 			want := tc.arg
 			cliClient, _ := client.NewClientFromNode("//127.0.0.1:26657")
-
 			queryClient := types.NewQueryClient(client.Context{Client: cliClient})
 			var req = types.QueryCertifierRequest{
 				Alias:   viper.GetString(FlagAlias),
