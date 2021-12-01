@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 
 	"github.com/certikfoundation/shentu/v2/x/cert/types"
 )
@@ -40,13 +40,12 @@ func GetCmdCertifier() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "certifier <address>",
 		Short: "Get certifier information",
-		Args:  cobra.RangeArgs(0, 1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
-
 			var req types.QueryCertifierRequest
 			req.Alias = viper.GetString(FlagAlias)
 			if len(args) > 0 {
@@ -180,7 +179,8 @@ func GetCmdPlatform() *cobra.Command {
 			}
 			queryClient := types.NewQueryClient(cliCtx)
 
-			pk, err := sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeConsPub, args[0])
+			var pk cryptotypes.PubKey
+			err = cliCtx.JSONCodec.UnmarshalJSON([]byte(args[0]), pk)
 			if err != nil {
 				return err
 			}
